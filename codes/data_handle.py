@@ -7,9 +7,10 @@ import datetime
 
 
 class GetData():
-    def __init__(self, future='IC', time_frequency=240) -> None:
+    def __init__(self, future='IC', time_frequency=240, index_data = False) -> None:
         self.future = future
         self.time_frequency = time_frequency
+        self.read_data(index_data=index_data)
 
     def __str__(self) -> str:
         param_list = ['future', 'time_frequency']
@@ -21,10 +22,12 @@ class GetData():
                          f'{count}\n')
         return f_string
     
-    def read_data(self):
+    def read_data(self,index_data):
         self.future_data = pd.read_csv('data\IC_1_min.csv', header=0, index_col=0)
         self.factor_data = pd.read_csv('data\IC_info.csv', header=0, index_col=0)[['date', 'factor']]
-    
+        if index_data:
+            self.index_data = pd.read_csv('data\..csv')
+
     @staticmethod
     def get_date_time(data, time_frequency=240):
         """获取 datetime类型数据
@@ -63,7 +66,6 @@ class GetData():
         return self.data
 
     def run(self):
-        self.read_data()
         self.future_data['date_time'] = self.get_date_time(self.future_data) # 计算因子需要
         option_data = self.get_refactor_price()
         return option_data

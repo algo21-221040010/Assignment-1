@@ -157,6 +157,8 @@ if __name__ == '__main__':
 
     s = 0 # 策略 阈值
 
-    allocation = 10000000 # 策略初始资金一千万
+    # 获取 复权数据
+    d = GetData(index_data=True)
+    data = d.run()
 
-    
+    allocation = 10000000 # 策略初始资金一千万
