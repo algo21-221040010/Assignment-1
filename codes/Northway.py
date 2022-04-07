@@ -162,3 +162,23 @@ if __name__ == '__main__':
     data = d.run()
 
     allocation = 10000000 # 策略初始资金一千万
+
+    # 导入 数据
+    price_data = pd.read_csv('data/close.csv', header = 0)
+    amount_data = pd.read_csv('data/amount.csv', header = 0)
+    oi_data = pd.read_csv('data/northway/North_Quantity.csv', header = 0)
+    north_buy_sell = pd.read_excel('data/northway/northway_buy_sell.xlsx',header = 0)
+
+    index_data = pd.read_csv('data/'+ index_code +'.csv', header = 0)
+    # 期货日度数据
+    future_data = pd.read_csv('data/'+ future_code +'_settle_factor_dlv_info.csv', header=0)
+    # 复权
+    future_data = get_indayFreq_fuQuanData(future_code, 240, future_data)
+
+    # 获取 因子数据
+    data_factor = get_factor(price_data,amount_data,oi_data,north_buy_sell,index_data,future_data, start_dt, end_dt)
+    data_factor = get_newFreq_datetime(data_factor)
+    data_factor = data_factor.reset_index()
+    
+    # 获取 买卖信号数据
+    data_sig = get_trading_sig(data_factor)
