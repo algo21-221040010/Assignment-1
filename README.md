@@ -24,7 +24,7 @@ There are 3 folders in this repository
 ### 1) IH
 - parameter: (60,-50)
 - backtest result
-![策略净值图](data\Northway-Ver2(60,-50)_IH_all_strategy_netValue.png)
+![strategy net value](data\Northway-Ver2(60,-50)_IH_all_strategy_netValue.png)
 
 
 |      | annualized rate of return   | annualized volatility   | annualized rate of return of underlying asset   | excess rate of return  |   Sharpe |   Maximum DrawDown |   winning rate |   profit and coss ratio |   
@@ -34,7 +34,7 @@ There are 3 folders in this repository
 #### 2) IF
 - parameter: (60,-50)
 - backtest result
-![策略净值图](data\Northway-Ver2(60,-50)_IF_all_strategy_netValue.png)
+![strategy net value](data\Northway-Ver2(60,-50)_IF_all_strategy_netValue.png)
 
 |      | annualized rate of return   | annualized volatility   | annualized rate of return of underlying asset   | excess rate of return  |   Sharpe |   Maximum DrawDown |   winning rate |   profit and coss ratio | 
 |---:|:-------|:-------------|:-------------|:---------------|:-------------|---------:|-----------:|-------:|---------:|---------------:|
@@ -43,7 +43,7 @@ There are 3 folders in this repository
 #### 3) IC
 - parameter: (300, -40)
 - backtest result
-![策略净值图](data\Northway-Ver2(300,-40)_IC_all_strategy_netValue.png)
+![strategy net value](data\Northway-Ver2(300,-40)_IC_all_strategy_netValue.png)
 
 |      | annualized rate of return   | annualized volatility   | annualized rate of return of underlying asset   | excess rate of return  |   Sharpe |   Maximum DrawDown |   winning rate |   profit and coss ratio | 
 |---:|:-------|:-------------|:-------------|:---------------|:-------------|---------:|-----------:|-------:|---------:|---------------:|
