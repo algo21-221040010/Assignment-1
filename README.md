@@ -5,55 +5,55 @@ This is the repository for assignment 2, which follows the work of a research pa
 ## What is Included
 There are 3 folders in this repository
 - 1. **'codes'** folder contains all of our code implementations, they are:
-  - **'data_handle.py'** which helps to read in data and process data.
-  - **'signal_handle.py'** which contains how to process signals and mark the signals in pictures which can be found in the 'data\result_data' folder.
-  - **'Northway.py'** which calculates the factor ***Northway***, and the trading signal. 
-  - **'main.py'** , run this file and you can get the trading signal of our strategy.
+    - **'data_handle.py'** which helps to read in data and process data.
+    - **'signal_handle.py'** which contains how to process signals and mark the signals in pictures which can be found in the 'data\result_data' folder.
+    - **'Northway.py'** which calculates the factor ***Northway***, and the trading signal. 
+    - **'main.py'** , run this file and you can get the trading signal of our strategy.
 - 2. **'research_paper'** contains the pdf file of this paper.
 - 3. **'data'** folder contains:
-  - input data.
-  - result pictures.
+    - input data.
+    - result pictures such as picture of trading signal(see below).
   
 ![trading signal](data\trading_signal.png)
 
-## how to calculate *Northway Factor*
- $factor = Σ[( OI_t - OI_{t-1} ) *P_t]$ 
+## How to Calculate *Northway Factor*
+$factor = Σ[( OI_t - OI_{t-1} ) *P_t]$ 
  (Summation of all underlying stock in the stock index)
 
-## backtest result
+## Backtest Result
 ### 1) IH
-- parameter: (60,-50)
-- backtest result
+- Parameter: (60,-50)
+- Backtest Result
 
-    under this pair of parameter, the strategy performs quite well during 2017.01 - 2021.06. The average annualized rate of return is 14.23%, which excess the average annualized rate of return of the underlying stock index. Meanwhile, the annualized volatility is just 10.86%, with maximum drawdown at 0.11, which indicates the risk and volatility of this strategy is quite low.
+    Under this pair of parameter, the strategy performs quite well during 2017.01 - 2021.06. The average annualized rate of return is 14.23%, which excess the average annualized rate of return of the underlying stock index. Meanwhile, the annualized volatility is just 10.86%, with maximum drawdown at 0.11, which indicates the risk and volatility of this strategy is quite low.
 
 ![net value of strategy](data\Northway-Ver2(60,-50)_IH_all_strategy_netValue.png)
 
-|      | annualized rate of return   | annualized volatility   | annualized rate of return of underlying asset   | excess rate of return  |   Sharpe |   Maximum DrawDown |   winning rate |   profit and coss ratio |   
+|      | Annualized Rate of Return   | Annualized Volatility   | Annualized Rate of Return of Underlying Asset   | Excess Rate of Return  |   Sharpe |   Maximum DrawDown |   Winning Rate |   Profit and Coss Ratio |    
 |:-------|:-------------|:-------------|:---------------|:-------------|---------:|-----------:|-------:|---------:|---------------:|
 | Total     | 14.23%       | 10.86%       | 14.66%         | -0.43%       |     1.31 |      -0.11 |   0.74 |    -1.45 |  
 
 ### 2) IF
-- parameter: (60,-50)
-- backtest result
+- Parameter: (60,-50)
+- Backtest Result
 
-    under this pair of parameter, the strategy performs well during 2017.01 - 2021.06. The average annualized rate of return is 12.41%, and the annualized volatility is just 10.97%.
+    Under this pair of parameter, the strategy performs well during 2017.01 - 2021.06. The average annualized rate of return is 12.41%, and the annualized volatility is just 10.97%.
 
 ![net value of strategy](data\Northway-Ver2(60,-50)_IF_all_strategy_netValue.png)
 
-|      | annualized rate of return   | annualized volatility   | annualized rate of return of underlying asset   | excess rate of return  |   Sharpe |   Maximum DrawDown |   winning rate |   profit and coss ratio | 
+|      | Annualized Rate of Return   | Annualized Volatility   | Annualized Rate of Return of Underlying Asset   | Excess Rate of Return  |   Sharpe |   Maximum DrawDown |   Winning Rate |   Profit and Coss Ratio |  
 |---:|:-------|:-------------|:-------------|:---------------|:-------------|---------:|-----------:|-------:|---------:|---------------:|
 |  Total     | 12.41%       | 10.97%       | 17.81%         | -5.40%       |     1.13 |      -0.23 |   0.67 |    -1.86 |       
 
 ### 3) IC
-- parameter: (300, -40)
-- backtest result
+- Parameter: (300, -40)
+- Backtest Result
 
     under this pair of parameter, the average annualized rate of return is 7.25%, and the annualized volatility is 16.90%. 
 
 ![net value of strategy](data\Northway-Ver2(300,-40)_IC_all_strategy_netValue.png)
 
-|      | annualized rate of return   | annualized volatility   | annualized rate of return of underlying asset   | excess rate of return  |   Sharpe |   Maximum DrawDown |   winning rate |   profit and coss ratio | 
+|      | Annualized Rate of Return   | Annualized Volatility   | Annualized Rate of Return of Underlying Asset   | Excess Rate of Return  |   Sharpe |   Maximum DrawDown |   Winning Rate |   Profit and Coss Ratio | 
 |---:|:-------|:-------------|:-------------|:---------------|:-------------|---------:|-----------:|-------:|---------:|---------------:|
 | Total     | 7.25%        | 16.90%       | 17.37%         | -10.13%      |     0.43 |      -0.36 |   0.61 |    -0.95 |       
 
