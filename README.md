@@ -16,7 +16,7 @@ There are 3 folders in this repository
   
 ![trading signal](data\trading_signal.png)
 
-## how to calculate *Northway Factor* ?
+## how to calculate *Northway Factor*
  $factor = Σ[( OI_t - OI_{t-1} ) *P_t]$ 
  (Summation of all underlying stock in the stock index)
 
@@ -24,7 +24,8 @@ There are 3 folders in this repository
 ### 1) IH
 - parameter: (60,-50)
 - backtest result
-under this pair of parameter, the strategy performs quite well during 2017.01 - 2021.06. The average annualized rate of return is 14.23%, which excess the average annualized rate of return of the underlying stock index. Meanwhile, the annualized volatility is just 10.86%, with maximum drawdown at 0.11, which indicates the risk and volatility of this strategy is quite low.
+
+    under this pair of parameter, the strategy performs quite well during 2017.01 - 2021.06. The average annualized rate of return is 14.23%, which excess the average annualized rate of return of the underlying stock index. Meanwhile, the annualized volatility is just 10.86%, with maximum drawdown at 0.11, which indicates the risk and volatility of this strategy is quite low.
 
 ![net value of strategy](data\Northway-Ver2(60,-50)_IH_all_strategy_netValue.png)
 
@@ -32,10 +33,11 @@ under this pair of parameter, the strategy performs quite well during 2017.01 - 
 |:-------|:-------------|:-------------|:---------------|:-------------|---------:|-----------:|-------:|---------:|---------------:|
 | Total     | 14.23%       | 10.86%       | 14.66%         | -0.43%       |     1.31 |      -0.11 |   0.74 |    -1.45 |  
 
-#### 2) IF
+### 2) IF
 - parameter: (60,-50)
 - backtest result
-under this pair of parameter, the strategy performs well during 2017.01 - 2021.06. The average annualized rate of return is 12.41%, and the annualized volatility is just 10.97%.
+
+    under this pair of parameter, the strategy performs well during 2017.01 - 2021.06. The average annualized rate of return is 12.41%, and the annualized volatility is just 10.97%.
 
 ![net value of strategy](data\Northway-Ver2(60,-50)_IF_all_strategy_netValue.png)
 
@@ -43,10 +45,11 @@ under this pair of parameter, the strategy performs well during 2017.01 - 2021.0
 |---:|:-------|:-------------|:-------------|:---------------|:-------------|---------:|-----------:|-------:|---------:|---------------:|
 |  Total     | 12.41%       | 10.97%       | 17.81%         | -5.40%       |     1.13 |      -0.23 |   0.67 |    -1.86 |       
 
-#### 3) IC
+### 3) IC
 - parameter: (300, -40)
 - backtest result
-under this pair of parameter, the average annualized rate of return is 7.25%, and the annualized volatility is 16.90%. 
+
+    under this pair of parameter, the average annualized rate of return is 7.25%, and the annualized volatility is 16.90%. 
 
 ![net value of strategy](data\Northway-Ver2(300,-40)_IC_all_strategy_netValue.png)
 
@@ -58,4 +61,4 @@ under this pair of parameter, the average annualized rate of return is 7.25%, an
 ## Analysis
 It is clear that the Northway factor performs best at IH, then IF, and perform worst at IC.
 
-That is mainly because majority of the northway funds flows to most liquid stocks. The SSE 50  consists of the 50 largest and most liquid A-share stocks listed on Shanghai Stock Exchange, the CSI 300 consists of the top 300 stocks in the Shanghai or Shenzhen Stock Exchanges, while the CSI 500 selects 500 Middle and small stocks after excluding both the CSI 300 Index constituents and the top 300 stocks in SSE, so the net inflow of northway assets works better for the first two.
+This is mainly because majority of the northway funds flows to most liquid stocks. The SSE 50 consists of the 50 largest and most liquid A-share stocks, the CSI 300 consists of the top 300 stocks in the Shanghai or Shenzhen Stock Exchanges, while the CSI 500 selects 500 Middle and small stocks after excluding the CSI 300 Index constituents, so the net inflow of northway assets mainly contributes to the first two stock index, thus the northway factor works better for the first two.
