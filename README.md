@@ -24,6 +24,8 @@ There are 3 folders in this repository
 ### 1) IH
 - parameter: (60,-50)
 - backtest result
+under this pair of parameter, the strategy performs quite well during 2017.01 - 2021.06. The average annualized rate of return is 14.23%, which excess the average annualized rate of return of the underlying stock index. Meanwhile, the annualized volatility is just 10.86%, with maximum drawdown at 0.11, which indicates the risk and volatility of this strategy is quite low.
+
 ![net value of strategy](data\Northway-Ver2(60,-50)_IH_all_strategy_netValue.png)
 
 |      | annualized rate of return   | annualized volatility   | annualized rate of return of underlying asset   | excess rate of return  |   Sharpe |   Maximum DrawDown |   winning rate |   profit and coss ratio |   
@@ -33,6 +35,8 @@ There are 3 folders in this repository
 #### 2) IF
 - parameter: (60,-50)
 - backtest result
+under this pair of parameter, the strategy performs well during 2017.01 - 2021.06. The average annualized rate of return is 12.41%, and the annualized volatility is just 10.97%.
+
 ![net value of strategy](data\Northway-Ver2(60,-50)_IF_all_strategy_netValue.png)
 
 |      | annualized rate of return   | annualized volatility   | annualized rate of return of underlying asset   | excess rate of return  |   Sharpe |   Maximum DrawDown |   winning rate |   profit and coss ratio | 
@@ -42,6 +46,8 @@ There are 3 folders in this repository
 #### 3) IC
 - parameter: (300, -40)
 - backtest result
+under this pair of parameter, the average annualized rate of return is 7.25%, and the annualized volatility is 16.90%. 
+
 ![net value of strategy](data\Northway-Ver2(300,-40)_IC_all_strategy_netValue.png)
 
 |      | annualized rate of return   | annualized volatility   | annualized rate of return of underlying asset   | excess rate of return  |   Sharpe |   Maximum DrawDown |   winning rate |   profit and coss ratio | 
