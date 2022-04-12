@@ -4,6 +4,8 @@
     不在节假日交易 take_off_crossHoliday
 """
 import datetime
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 def adjust_trading_sig(data):
@@ -115,3 +117,26 @@ def take_off_crossHoliday(data):
             #print('删除第{}个于{}产生信号{}实际买入的交易，因为是跨假期交易'.format(i, datetime.datetime.date(buy_date[i]), datetime.datetime.date(shifted_buydt[i])) )
     return drop_list
 
+# 绘制买卖信号图
+def draw_trade_sig(sig_data, time_freq, startdt=20120000, enddt=20220000):
+    """绘制买卖信号图
+
+    Args:
+        sig_data (dataframe): 原始数据（字段['date_time','date','open','sig'])
+        time_freq (int): 原始数据的时间频率
+        startdt (int, optional): 时间区间的开始日期. Defaults to 20120000.
+        enddt (int, optional): 时间区间的结束日期. Defaults to 20220000.
+    """    
+    data = sig_data[ (sig_data.date>=int(startdt)) & (sig_data.date<=int(enddt)) ]
+    data.set_index(['date_time'], inplace=True)
+    buy_idx = list(data[ data.sig==1 ].index)
+    sell_idx = list(data[ data.sig==-1 ].index)
+    plt.figure(figsize=(16, 8))
+    plt.plot(data['open'],label="open price",color='k',linewidth=1)
+    plt.plot(data['open'][buy_idx],'^',color='red',label="buy", markersize=8)
+    plt.plot(data['open'][sell_idx],'gv',label="sell", markersize=8)
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+    # plt.savefig(r"data\result_data\{}_min_trading_sig.png".format(time_freq))
+    plt.close()

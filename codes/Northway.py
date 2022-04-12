@@ -119,5 +119,6 @@ if __name__ == '__main__':
     
     # 获取 买卖信号数据
     data_sig = get_trading_sig(data_factor, s1,s_1)
-    data_sig = get_trading_sig_M(data_factor, s1,s_1)
+    # data_sig = get_trading_sig_M(data_factor)
     print(data_sig)
+    draw_trade_sig(data_sig, time_freq=240, startdt=20120000, enddt=20220000)
