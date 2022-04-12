@@ -7,10 +7,13 @@ import datetime
 
 
 class GetData():
-    def __init__(self, future='IC', time_frequency=240, index_data = False) -> None:
+    """获取 复权后的期货 & 指数数据"""
+    def __init__(self, future='IC', time_frequency=240) -> None:
+        index_future_code = {'IC':'000905.SH','IF':'000300.SH','IH':'000016.SH'}
         self.future = future
+        self.index = index_future_code[future]
         self.time_frequency = time_frequency
-        self.read_data(index_data=index_data)
+        self.read_option_data()
 
     def __str__(self) -> str:
         param_list = ['future', 'time_frequency']
@@ -22,14 +25,23 @@ class GetData():
                          f'{count}\n')
         return f_string
     
-    def read_data(self,index_data):
-        self.future_data = pd.read_csv('data\IC_1_min.csv', header=0, index_col=0)
-        self.factor_data = pd.read_csv('data\IC_info.csv', header=0, index_col=0)[['date', 'factor']]
-        if index_data:
-            self.index_data = pd.read_csv('data\..csv')
+    def read_option_data(self):
+        if self.time_frequency < 240:
+            self.factor_data = pd.read_csv(f'data\{self.future}_info.csv', header=0, index_col=0)[['date', 'factor']]
+            self.future_data = pd.read_csv(f'data\{self.future}_1_min.csv', header=0, index_col=0)
+            self.future_data = transfer_timeFreq(self.future_data, self.time_frequency, ic_multiplier=200)
+        elif self.time_frequency == 240:
+            self.future_data = pd.read_csv(f'data\{self.future}_info.csv', header=0, index_col=0)
+            pass # self.future_data = self.factor_data
+        
+
+    def get_index_data(self):
+        self.index_data = pd.read_csv(f'data\{self.index}.csv', header = 0)
+        self.index_data.rename(columns={'20100104':'date'}, inplace=True)
+        return self.index_data
 
     @staticmethod
-    def get_date_time(data, time_frequency=240):
+    def get_date_time(data, col='date', time_frequency=240):
         """获取 datetime类型数据
 
         Args:
@@ -43,7 +55,7 @@ class GetData():
             datetime: 一列数据
         """        
         if time_frequency == 240: # 无 'time' 字段
-            return data.apply(lambda x:datetime.datetime.strptime(str(int(x['date']))\
+            return data.apply(lambda x:datetime.datetime.strptime(str(int(x[col]))\
                     +' '+str(1500),'%Y%m%d %H%M'), axis=1) 
         elif time_frequency < 240:
             return data.apply(lambda x:datetime.datetime.strptime(str(int(x['date']))\
@@ -58,19 +70,103 @@ class GetData():
         Returns:
             dataframe: 复权后的期货数据 含字段['r_high', 'r_low', 'r_open', 'r_close']
         """        
-        self.data = pd.merge(self.future_data, self.factor_data, on='date')
+        if self.time_frequency < 240:
+            self.data = pd.merge(self.future_data, self.factor_data, on='date')
+        elif self.time_frequency == 240:
+            self.data = self.future_data
         # 复权
         col_list = ['high','low','open','close']
+        print(self.data.columns)
         for i in col_list:
             self.data['r_'+ i] = np.multiply(self.data[i], self.data['factor'])
         return self.data
 
-    def run(self):
+    def get_refactor_option_data(self):
         self.future_data['date_time'] = self.get_date_time(self.future_data) # 计算因子需要
         option_data = self.get_refactor_price()
         return option_data
 
+class MergeSingleStocks():
+    """ 整合沪港通、深港通的所有成分股的 成交额、交易量、 股票收盘价数据"""
+    def __init__(self, start_dt=20170101, end_dt=20210101) -> None:
+        """
+        Args:
+            start_dt (int): 研究时间起点 eg: 20170101
+            end_dt (int): 研究时间终点 eg: 20210101
+        
+        Attribute:
+            price_data (dataframe): 股票收盘价
+            amount_data (dataframe): 成交额数据
+            oi_data (dataframe): 北向交易量数据
+        """
+        self.price_data = pd.read_csv('data/close.csv', header = 0)
+        self.amount_data = pd.read_csv('data/amount.csv', header = 0)
+        self.oi_data = pd.read_csv('data/northway/North_Quantity.csv', header = 0)
+        self.oi_data.rename(columns={'TRADE_DT':'date'}, inplace=True)
+        self.oi_data['date'] = self.oi_data['date'].apply(lambda x: int(x.split('/')[0]+x.split('/')[1].zfill(2)+x.split('/')[2].zfill(2)) )
+        self.cut_period(start_dt, end_dt)
+        self.start_dt = start_dt
+        self.end_dt = end_dt
+        
+    def cut_period(self, start_dt, end_dt):
+        # 数据时间截取 为 start_dt 和 end_dt 之间
+        # return data[(data['date']<int(end_dt)) & (data['date']>int(start_dt))]
+        self.price_data = self.price_data[(self.price_data['date']<int(end_dt)) & 
+                                            (self.price_data['date']>int(start_dt))]
+        self.amount_data = self.amount_data[(self.amount_data['date']<int(end_dt)) & 
+                                            (self.amount_data['date']>int(start_dt))]
+        self.oi_data = self.oi_data[(self.oi_data['date']<int(end_dt)) & (self.oi_data['date']>int(start_dt))]
+    
+    @staticmethod
+    def stack_data(data, col_name, idx_name='date'):
+        data = data.set_index(idx_name)
+        data = data.stack()
+        data.name = col_name
+        data = data.reset_index() #去掉所有索引
+        return data
 
+    def merge_stock_info(self):
+        ## 将 价、量、额、成分股 数据整合在一起 ===>计算因子值
+        self.price_data = self.stack_data(self.price_data, col_name='close')
+        self.amount_data = self.stack_data(self.amount_data, col_name='amount')
+        self.oi_data = self.stack_data(self.oi_data, col_name='oi')
+
+        # 价量 整合
+        data = pd.merge(self.oi_data, self.price_data, on=['date','level_1'], how='outer')
+        # 和 额 整合
+        data = pd.merge(data, self.amount_data, on=['date','level_1'], how='outer')
+        data.rename(columns={'level_1':'code'}, inplace=True)
+        return data
+
+    def find_index_conponent(self, data, index_data):
+        # 再筛选 股指成分股
+        index_data = self.stack_data(index_data, col_name='code')
+        index_data.drop(['level_1'],axis=1, inplace=True)
+
+        index_data = index_data[(index_data['date']<self.end_dt) & (index_data['date']>self.start_dt)]
+        index_data['is_in_index'] = 1
+        # merge 只留下是index成分股的股票消息
+        data = pd.merge(data, index_data, on=['date','code'], how='right') 
+        return data
+
+    def fillna(self, data):
+        """ 处理数据缺失问题 """
+        # 港交所休息（而内地交易所正常交易）导致的交易量缺失
+        null_num = data[data.oi.isnull()]['date'].value_counts()
+        null_day = list(null_num[null_num==50].index)
+        data.drop(data[data.date.isin(null_day)].index , inplace=True)
+        print('港交所休息（而内地交易所正常交易）的日期：', null_day)
+        # 其他数据缺失：按前值填充
+        data.fillna(method='ffill', inplace=True)
+        return data
+
+    def get_index_component_info(self, index_data):
+        data = self.merge_stock_info()
+        data = self.find_index_conponent(data, index_data)
+        data = self.fillna(data)
+        
+        return data
+    
 
 # 转换数据 时间频率
 def transfer_timeFreq(ori_data, time_freq, ic_multiplier=200):
@@ -113,117 +209,13 @@ def transfer_timeFreq(ori_data, time_freq, ic_multiplier=200):
     data_newfreq['date_time'] = GetData().get_date_time(data_newfreq)
     return data_newfreq
 
-# 调整 sig 数据，假设不持有 空头    
-def adjust_trading_sig(data):
-    """_summary_
-
-    Args:
-        data (dateframe): 因子数据（字段['sig']）
-
-    Raises:
-        NameError: there is no signal!
-
-    Returns:
-        dateframe: 信号数据（字段['sig','pos']）
-    """
-    ### 调整多空头: 不考虑空头，保证【多头、空头交错】
-    buy_idx = data[ data.sig==1 ].index.tolist()
-    sell_idx = data[ data.sig==-1 ].index.tolist()
-    if not (buy_idx and sell_idx): # 只要 buy、sell一个为空
-        raise NameError('there is no signal!')
-    buy_sell_idx = [buy_idx, sell_idx] # 列表嵌套列表
-
-    sig_list = []      
-    sig_list.append(buy_sell_idx[0][0])
-    i,j = 0,1
-    while i<len(buy_sell_idx[0]) and j< len(buy_sell_idx[1])+1:
-        # sell_index和 buy相比，大于则纳入sig
-        if len(sig_list)%2==1:
-            if buy_sell_idx[1][i] > sig_list[-1]:
-                sig_list.append(buy_sell_idx[1][i])
-                i += 1
-            elif buy_sell_idx[1][i] <= sig_list[-1]:
-                del buy_sell_idx[1][i]
-        # buy_index和 sell相比，大于则纳入sig
-        elif len(sig_list)%2==0:
-            if buy_sell_idx[0][j]>sig_list[-1]:
-                sig_list.append(buy_sell_idx[0][j])
-                j += 1
-            elif buy_sell_idx[0][j]<=sig_list[-1]:
-                del buy_sell_idx[0][j]
-        else:
-            print('\n','!'*80,'\nsth wrong!!!!!!')
-
-    #print('before #'*8,len(buy_idx), len(sell_idx))
-    # 若结果sell/buy有多，截取
-    if len(buy_sell_idx[0])<len(buy_sell_idx[1]):
-        buy_sell_idx[1] = buy_sell_idx[1][:len(buy_sell_idx[0])]
-        print('减去了sell')
-    elif len(buy_sell_idx[0])>len(buy_sell_idx[1]):        
-        buy_sell_idx[0] = buy_sell_idx[0][:len(buy_sell_idx[1])]
-        print('减去了buy')
-    print('\n','#--'*8, len(buy_sell_idx[0]), len(buy_sell_idx[1]))
-    #print(buy_sell_idx[0], buy_sell_idx[1])
-
-    # 修正 sig 数据
-    data['sig'] = 0
-    data.loc[buy_sell_idx[0],'sig'] = 1
-    data.loc[buy_sell_idx[1],'sig'] = -1
-    ### 删除 跨假期交易
-    drop_list = take_off_crossHoliday(data)
-    print('删除第{}个位置的信号数据，因为这是跨期交易'.format(drop_list))
-    k = 0
-    for i in drop_list:
-        del buy_sell_idx[0][i-k]
-        del buy_sell_idx[1][i-k]
-        k += 1
-    
-    # 修正 sig 数据
-    data['sig'] = 0
-    data.loc[buy_sell_idx[0],'sig'] = 1
-    data.loc[buy_sell_idx[1],'sig'] = -1
-
-    # 信号的第二天再真正交易(可能把最后一天的卖shift掉，导致买卖不对称)
-    if data['sig'].iloc[-1]==-1 and data['sig'].iloc[-2]!=1:
-        data['sig'].iloc[-2]=-1
-        print('删了一个')
-    elif data['sig'].iloc[-1]==-1 and data['sig'].iloc[-2]==1:
-        data['sig'].iloc[-2]=0 # 因为不能同一天买卖，所以这次交易取消
-        print('删了一对')
-    data['sig'] = data['sig'].shift(1).fillna(0)
-
-    # 求持仓数据
-    data['pos'] = np.cumsum(data['sig'])
-    return data
-
-def take_off_crossHoliday(data):
-    """删除在节假日前一天产生的信号，因为实际交易会延迟到下一交易日（假期后）
-
-    Args:
-        data (dateframe): 因子数据（字段['sig','date_time']）
-
-    Returns:
-        list: 删除的信号的 位置
-    """
-    buy_date = list(data[ data.sig==1 ].date_time)
-
-    data = data.copy()
-    data['sig'] = data['sig'].shift(1).fillna(0)
-    shifted_buydt = list(data[ data.sig==1 ].date_time)
-    if len(shifted_buydt)<len(buy_date):
-        buy_date.pop()
-    
-    drop_list = []
-    # 如果买入信号生成时刻，和 买入信号执行时刻（即下一期）之间隔有法定假期，则为跨假期交易
-    for i in range(len(buy_date)):
-        # buy_date 和 shifted_buydt 不在同一日，且二者之间至少间隔 1 天
-        if (datetime.datetime.date(shifted_buydt[i])-datetime.datetime.date(buy_date[i])) > datetime.timedelta(days=1):
-            drop_list.append(i)
-            #print('删除第{}个于{}产生信号{}实际买入的交易，因为是跨假期交易'.format(i, datetime.datetime.date(buy_date[i]), datetime.datetime.date(shifted_buydt[i])) )
-    return drop_list
-
 
 if __name__ == '__main__': 
-    d = GetData()
-    data = d.run()
+    d = GetData(future='IC', time_frequency=240)
+    index_data = d.get_index_data()
+
+    start_dt = 20170101
+    end_dt = 20210617
+    m = MergeSingleStocks(start_dt, end_dt)
+    data = m.get_index_component_info(index_data)
     print(data)
